@@ -1,4 +1,11 @@
-.kratt-search .kratt-search-input { width: 100%; font-size: var(--font-ui-medium); padding: var(--size-4-2); }
+/* Sits near the top like Obsidian's own prompts, not in the middle. */
+.modal.kratt-search { align-self: flex-start; margin-top: 12vh; }
+/* On phones, right under the status bar, so the keyboard never covers it. */
+.is-phone .modal.kratt-search { margin-top: calc(var(--safe-area-inset-top, 0px) + var(--size-4-2)); max-height: 85vh; }
+
+.kratt-search .kratt-search-bar { display: flex; gap: var(--size-4-2); }
+.kratt-search .kratt-search-input { flex: 1; min-width: 0; font-size: var(--font-ui-medium); padding: var(--size-4-2); }
+.kratt-search .kratt-search-button { flex: none; }
 .kratt-search .kratt-search-status { color: var(--text-muted); font-size: var(--font-ui-smaller); margin: var(--size-4-2) 0; min-height: 1.2em; }
 .kratt-search .kratt-search-nothing { color: var(--text-warning); margin-bottom: var(--size-4-2); }
 .kratt-search .kratt-search-result { padding: var(--size-4-2); border-radius: var(--radius-s); cursor: pointer; }
@@ -6,3 +13,12 @@
 .kratt-search .kratt-search-title { font-weight: var(--font-semibold); }
 .kratt-search .kratt-search-path { color: var(--text-faint); font-size: var(--font-ui-smaller); }
 .kratt-search .kratt-search-snippet { color: var(--text-muted); font-size: var(--font-ui-small); margin-top: 2px; }
+
+.kratt-search .kratt-search-spinner {
+	width: 28px; height: 28px; margin: var(--size-4-8) auto;
+	border: 3px solid var(--background-modifier-border);
+	border-top-color: var(--interactive-accent);
+	border-radius: 50%;
+	animation: kratt-search-spin 0.8s linear infinite;
+}
+@keyframes kratt-search-spin { to { transform: rotate(360deg); } }

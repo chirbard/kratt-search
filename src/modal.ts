@@ -1,4 +1,4 @@
-import { App, Modal, TFile } from "obsidian";
+import { App, Modal, Platform, TFile } from "obsidian";
 import type { Client } from "./core/api.ts";
 import { FINALISTS, search, type Candidate, type Outcome } from "./core/search.ts";
 import type { Index } from "./core/store.ts";
@@ -17,6 +17,7 @@ export class SearchModal extends Modal {
 	selected = 0;
 	statusEl!: HTMLElement;
 	listEl!: HTMLElement;
+	inputEl!: HTMLInputElement;
 
 	constructor(app: App, client: Client, index: Index) {
 		super(app);
@@ -26,8 +27,16 @@ export class SearchModal extends Modal {
 
 	onOpen(): void {
 		this.modalEl.addClass("kratt-search");
-		const input = this.contentEl.createEl("input", { type: "text", placeholder: "Describe the note you're looking for, then press Enter" });
+		const bar = this.contentEl.createDiv({ cls: "kratt-search-bar" });
+		const input = bar.createEl("input", { type: "search", placeholder: "Describe the note you're looking for" });
 		input.addClass("kratt-search-input");
+		// Phones show a "Search" key instead of "return".
+		input.enterKeyHint = "search";
+		this.inputEl = input;
+		if (Platform.isMobile) {
+			const button = bar.createEl("button", { text: "Search", cls: "mod-cta kratt-search-button" });
+			button.addEventListener("click", () => this.submit());
+		}
 		this.statusEl = this.contentEl.createDiv({ cls: "kratt-search-status" });
 		this.listEl = this.contentEl.createDiv({ cls: "kratt-search-results" });
 		input.addEventListener("keydown", (event) => this.onKey(event, input));
@@ -48,7 +57,16 @@ export class SearchModal extends Modal {
 			void this.openResult(this.results[this.selected]);
 			return;
 		}
+		this.submit();
+	}
+
+	private submit(): void {
+		const input = this.inputEl;
 		input.dataset.searched = input.value;
+		// Drops the phone keyboard so the results have the screen.
+		if (Platform.isMobile) {
+			input.blur();
+		}
 		void this.run(input.value.trim());
 	}
 
@@ -58,14 +76,17 @@ export class SearchModal extends Modal {
 		}
 		this.listEl.empty();
 		this.statusEl.setText("Searching…");
+		this.listEl.createDiv({ cls: "kratt-search-spinner" });
 		try {
 			this.show(await search(this.client, this.index, query, FINALISTS));
 		} catch (error) {
+			this.listEl.empty();
 			this.statusEl.setText(`Search failed: ${String(error)}`);
 		}
 	}
 
 	private show(outcome: Outcome): void {
+		this.listEl.empty();
 		this.results = outcome.results.slice(0, SHOWN);
 		this.selected = 0;
 		let status = `${(outcome.millis / 1000).toFixed(1)} s · $${outcome.cost.toFixed(4)}`;

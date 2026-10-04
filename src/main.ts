@@ -3,7 +3,7 @@ import type { Client, Post } from "./core/api.ts";
 import { chunkCount } from "./core/store.ts";
 import { Indexer } from "./indexer.ts";
 import { SearchModal } from "./modal.ts";
-import { DEFAULTS, SettingsTab, type Settings } from "./settings.ts";
+import { DEFAULTS, SettingsTab, loadUpdateHere, type Settings } from "./settings.ts";
 
 // Edits are batched: a note being typed in changes every second.
 const UPDATE_DELAY_MS = 60_000;
@@ -50,13 +50,13 @@ export default class KrattSearch extends Plugin {
 		this.registerEvent(this.app.vault.on("create", (file) => this.noteChanged(file)));
 		this.registerEvent(this.app.vault.on("delete", (file) => this.noteChanged(file)));
 		this.registerEvent(this.app.vault.on("rename", (file) => this.noteChanged(file)));
-		if (this.settings.updateIndexHere && this.settings.apiKey !== "") {
+		if (loadUpdateHere(this.app) && this.settings.apiKey !== "") {
 			await this.updateIndex(true);
 		}
 	}
 
 	private noteChanged(file: TAbstractFile): void {
-		if (!this.settings.updateIndexHere || !(file instanceof TFile) || file.extension !== "md") {
+		if (!loadUpdateHere(this.app) || !(file instanceof TFile) || file.extension !== "md") {
 			return;
 		}
 		if (this.pending !== null) {
@@ -112,8 +112,17 @@ export default class KrattSearch extends Plugin {
 		return { post: obsidianPost, apiKey: this.settings.apiKey, embedModel: this.settings.embedModel, jevModel: this.settings.jevModel };
 	}
 
+	// Copies only known keys, so the old synced "updateIndexHere" is dropped
+	// from data.json on the next save.
 	async loadSettings(): Promise<void> {
-		this.settings = { ...DEFAULTS, ...(await this.loadData()) };
+		const stored = (await this.loadData()) ?? {};
+		const settings: Settings = { ...DEFAULTS };
+		for (const key of Object.keys(DEFAULTS) as Array<keyof Settings>) {
+			if (typeof stored[key] === "string") {
+				settings[key] = stored[key];
+			}
+		}
+		this.settings = settings;
 	}
 
 	async saveSettings(): Promise<void> {

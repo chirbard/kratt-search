@@ -26,7 +26,14 @@ export class Indexer {
 		if (!(await adapter.exists(metaPath)) || !(await adapter.exists(binPath))) {
 			return;
 		}
-		this.index = deserialize(await adapter.read(metaPath), await adapter.readBinary(binPath));
+		const loaded = deserialize(await adapter.read(metaPath), await adapter.readBinary(binPath));
+		// A sync can land the new index.json before the new index.bin. A
+		// mismatched pair would score against the wrong rows -- keep what we had.
+		if (loaded.vectors.length !== loaded.scales.length * loaded.dim) {
+			console.warn("kratt-search: index files do not match yet; keeping the previous index");
+			return;
+		}
+		this.index = loaded;
 	}
 
 	private async save(): Promise<void> {

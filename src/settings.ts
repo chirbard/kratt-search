@@ -8,9 +8,6 @@ export interface Settings {
 	// Comma-separated folder prefixes; empty means the whole vault.
 	includeFolders: string;
 	excludeFolders: string;
-	// Off on phones by default: if both devices write the synced index, the
-	// sync tool makes conflict copies. Keep it current from the computer.
-	updateIndexHere: boolean;
 }
 
 export const DEFAULTS: Settings = {
@@ -19,8 +16,25 @@ export const DEFAULTS: Settings = {
 	jevModel: "typesafe/jev-1.13",
 	includeFolders: "",
 	excludeFolders: "Templates",
-	updateIndexHere: !Platform.isMobile,
 };
+
+// Whether this device writes the index. Deliberately NOT in Settings: those
+// live in data.json, which syncs -- a computer's "yes" reached the phone, both
+// wrote the synced index, and the sync tool made conflict copies. Local
+// storage is per device and never syncs. Off on phones unless turned on.
+const UPDATE_HERE_KEY = "kratt-search-update-index-here";
+
+export function loadUpdateHere(app: App): boolean {
+	const stored = app.loadLocalStorage(UPDATE_HERE_KEY);
+	if (typeof stored === "boolean") {
+		return stored;
+	}
+	return !Platform.isMobile;
+}
+
+export function saveUpdateHere(app: App, value: boolean): void {
+	app.saveLocalStorage(UPDATE_HERE_KEY, value);
+}
 
 export function folderList(value: string): string[] {
 	const folders: string[] = [];
@@ -51,10 +65,9 @@ export class SettingsTab extends PluginSettingTab {
 		this.textSetting("Jev model", "Pinned on purpose: results were measured on this version.", "jevModel", false);
 		new Setting(containerEl)
 			.setName("Keep the index up to date on this device")
-			.setDesc("Leave off on phones when the index syncs from a computer, so two devices never write it at once.")
-			.addToggle((toggle) => toggle.setValue(this.plugin.settings.updateIndexHere).onChange(async (value) => {
-				this.plugin.settings.updateIndexHere = value;
-				await this.plugin.saveSettings();
+			.setDesc("Remembered per device, not synced. Turn on for exactly one device when the index syncs between them -- two writers make sync conflicts.")
+			.addToggle((toggle) => toggle.setValue(loadUpdateHere(this.app)).onChange((value) => {
+				saveUpdateHere(this.app, value);
 			}));
 		new Setting(containerEl)
 			.setName("Index")
