@@ -3,7 +3,7 @@ import { BATCH_CHAR_BUDGET, packBySize } from "./pack.ts";
 import type { Index } from "./store.ts";
 import { cosineAt, norm } from "./vectors.ts";
 
-// The design measured in kratt-v4 (roadmap/research/jev-for-kratt):
+// The design measured on a real vault ("Why this design" in README.md):
 //   1. cosine over chunks -> each note's best chunk -> top SHORTLIST notes
 //   2. Jev asks of each "is this about what the user asks?"
 //   3. the top FINALISTS are compared head to head, every pair both ways

@@ -1,7 +1,6 @@
 // Splits a note into chunks of consecutive lines -- the unit Jev reads.
 //
-// Ported from kratt-v4 (src/index/chunk.rs), where it was measured on a real
-// vault. Daily notes separate thoughts with single newlines, so blank-line
+// Measured on a real 1,486-note vault (see "Why this design" in README.md). Daily notes separate thoughts with single newlines, so blank-line
 // paragraphs would leave whole days as one chunk. Lines are grouped until the
 // next would pass CHUNK_MAX_CHARS. A heading always starts a new chunk; a blank
 // line does too once the chunk has CHUNK_MIN_CHARS, so a lone "- [ ] milk" is
