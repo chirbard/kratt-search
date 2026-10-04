@@ -21,6 +21,17 @@ Enable it in Settings → Community plugins, paste your OpenRouter key, set
 "Folders to search", then run the command **kratt search: Update index**.
 Search with `Mod+Shift+K` or the ribbon icon.
 
+Or install from a GitHub release with the
+[BRAT](https://github.com/TfTHacker/obsidian42-brat) plugin: add this
+repository's URL, and BRAT keeps it updated.
+
+## Release
+
+Bump `version` in `manifest.json` and `package.json`, commit, then
+`git tag 0.1.1 && git push --tags` — the tag must equal the manifest version,
+without a "v". The Release action tests, builds and publishes `main.js`,
+`manifest.json` and `styles.css`.
+
 ## Develop
 
 Needs Node 22.18+. `npm test` (core logic, no Obsidian needed), `npm run typecheck`,
@@ -49,3 +60,5 @@ questions whose right answer was confirmed by the vault's owner:
 Known limits: Jev reads dates as text, so "the last time…" needs judgement
 from you; each search sends ~100 chunks of your notes to OpenRouter and Jev's
 provider; and the evidence is three questions, not a benchmark.
+
+MIT licensed.
