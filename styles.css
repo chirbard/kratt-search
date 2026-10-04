@@ -1,0 +1,8 @@
+.kratt-search .kratt-search-input { width: 100%; font-size: var(--font-ui-medium); padding: var(--size-4-2); }
+.kratt-search .kratt-search-status { color: var(--text-muted); font-size: var(--font-ui-smaller); margin: var(--size-4-2) 0; min-height: 1.2em; }
+.kratt-search .kratt-search-nothing { color: var(--text-warning); margin-bottom: var(--size-4-2); }
+.kratt-search .kratt-search-result { padding: var(--size-4-2); border-radius: var(--radius-s); cursor: pointer; }
+.kratt-search .kratt-search-result.is-selected { background: var(--background-modifier-hover); }
+.kratt-search .kratt-search-title { font-weight: var(--font-semibold); }
+.kratt-search .kratt-search-path { color: var(--text-faint); font-size: var(--font-ui-smaller); }
+.kratt-search .kratt-search-snippet { color: var(--text-muted); font-size: var(--font-ui-small); margin-top: 2px; }

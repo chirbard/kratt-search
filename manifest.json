@@ -1,0 +1,9 @@
+{
+  "id": "kratt-search",
+  "name": "kratt search",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Find the note you mean: chunk embeddings shortlist, Jev judges. Uses your OpenRouter key.",
+  "author": "chirbard",
+  "isDesktopOnly": false
+}
